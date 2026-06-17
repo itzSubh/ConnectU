@@ -213,7 +213,7 @@ export const dummyRecentMessagesData = [
         "media_url": "",
         "createdAt": "2025-07-17T10:11:08.437Z",
         "updatedAt": "2025-07-25T08:07:11.893Z",
-        "seen": true
+        "seen": false
     },
     {
         "_id": "686fb66c7f0dcbff63b239e7",

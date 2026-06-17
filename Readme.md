@@ -1,1 +1,2 @@
 <!-- URL.createObjectURL() is a static method in JavaScript that generates a unique, temporary URL string representing a local Blob, File, or MediaSource object. -->
+<!-- In React, dangerouslySetInnerHTML is the framework's replacement for using browser DOM innerHTML to programmatically inject raw HTML strings into a component. React intentionally gave this property a scary name to remind developers that rendering un-sanitized markup directly into the page bypasses React's default protection mechanisms. -->
