@@ -1,0 +1,1 @@
+<!-- URL.createObjectURL() is a static method in JavaScript that generates a unique, temporary URL string representing a local Blob, File, or MediaSource object. -->
