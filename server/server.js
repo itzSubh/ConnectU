@@ -4,6 +4,7 @@ import 'dotenv/config';
 import connectDB from './config/db.js';
 import dns from 'dns'
 import {inngest, functions} from './inngest/index.js'
+import {serve} from 'inngest/express'
 
 dns.setServers([
     '1.1.1.1',
