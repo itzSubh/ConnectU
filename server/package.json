@@ -12,12 +12,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@clerk/express": "^2.1.30",
+    "@imagekit/nodejs": "^7.8.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "imagekit": "^6.0.0",
     "inngest": "^4.7.0",
     "mongoose": "^9.7.1",
-    "multer": "^2.2.0"
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

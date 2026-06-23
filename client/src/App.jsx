@@ -9,11 +9,18 @@ import Profile from "./pages/Profile"
 import CreatePost from "./pages/CreatePost"
 import Feed from "./pages/Feed"
 import Layout from "./pages/Layout"
-import { useUser } from "@clerk/react"
+import { useAuth, useUser } from "@clerk/react"
 import {Toaster} from 'react-hot-toast'
+import { useEffect } from "react"
 function App() {
 
   const {user} = useUser();
+  const { getToken } = useAuth()
+  useEffect(() => {
+    if(user){
+      getToken().then((token) => console.log(token))
+    }
+  },[user])
   return (
     
     <>
