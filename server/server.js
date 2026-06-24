@@ -7,6 +7,9 @@ import { clerkMiddleware } from '@clerk/express'
 import {inngest, functions} from './inngest/index.js'
 import {serve} from 'inngest/express'
 import userRouter from './routes/user.routes.js';
+import postRouter from './routes/post.routes.js';
+import storyRouter from './routes/story.routes.js';
+import messageRouter from './routes/message.routes.js';
 
 dns.setServers([
     '1.1.1.1',
@@ -23,5 +26,11 @@ app.use(clerkMiddleware())
 app.get('/', (req, res) => res.send('Server is Running!!!'))
 app.use('/api/inngest', serve({ client: inngest, functions }))
 app.use('/api/user', userRouter)
+app.use('/api/post', postRouter)
+app.use('/api/story', storyRouter)
+app.use('/api/message', messageRouter)
+
+
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server is runnning on port ${PORT}`))
