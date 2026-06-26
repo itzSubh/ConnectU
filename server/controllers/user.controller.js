@@ -103,10 +103,10 @@ export const discoverUsers = async (req,res) => {
         const allUsers = await User.find(
             {
                 $or:[
-                    {username: newRegExp(input, 'i')},
-                    {email: newRegExp(input, 'i')},
-                    {full_name: newRegExp(input, 'i')},
-                    {location: newRegExp(input, 'i')},
+                    {username: new RegExp(input, 'i')},
+                    {email: new RegExp(input, 'i')},
+                    {full_name: new RegExp(input, 'i')},
+                    {location: new RegExp(input, 'i')},
                 ]
             }
         )
@@ -150,7 +150,7 @@ export const unfollowuser = async (req, res) => {
         const user = await User.findById(userId)
         user.following = user.following.filter(user => user !== id)
         await user.save()
-        const toUser = await User.findById(IdleDeadline)
+        const toUser = await User.findById(id)
         toUser.followers = toUser.followers.filter(user => user !== userId)
         await toUser.save()
         return res.json({success: true, message: 'You are no longer following this user'})
@@ -257,8 +257,11 @@ export const acceptConnectionsRequest = async (req, res) => {
 
 export const getUserProfiles = async (req, res) => {
     try {
+        console.log("Request body:", req.body);
         const { profileId }= req.body;
+        console.log("profileId:", profileId);
         const profile = await User.findById(profileId)
+        console.log("Found profile:", profile);
         if(!profile){
             return res.json({success: false, message: 'Profile not found'});
         }

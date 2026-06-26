@@ -26,6 +26,7 @@ export const addUserStory = async (req, res) => {
         const story = await Story.create({
             user: userId,
             content,
+            media_type,
             media_url,
             background_color
         })

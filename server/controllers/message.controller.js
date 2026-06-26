@@ -1,6 +1,6 @@
 import imagekit from "../config/imagekit.js";
 import Message from "../models/message.models.js";
-
+import fs from 'fs'
 // Create an empty object to store server side Event connections
 const connections = {};
 
@@ -19,7 +19,7 @@ export const sseController = (req, res) => {
 
     connections[userId] = res
 
-    res.write('log: Connected to SSE stream\n\n')
+    // res.write('data: Connected to SSE stream\n\n')
     req.on('close', () => {
         // remove the client's response object from the connection array
         delete connections[userId];
@@ -61,13 +61,14 @@ export const sendMessage = async (req, res) => {
             media_url
             })
 
-            return res.json({ success: true, message})
+
             // send message to to_user_id using SSE
 
             const messageWithUserData = await Message.findById(message._id).populate('from_user_id');
             if(connections[to_user_id]){
                 connections[to_user_id].write(`data: ${JSON.stringify(messageWithUserData)}\n\n`)
             }
+            return res.json({ success: true, message})
     } catch (error) {
         console.log(error);
         return res.json({success: false, message: error.message})
@@ -100,8 +101,14 @@ export const getChatMessages = async (req, res) => {
 export const getUserRecentMessages = async( req, res) => {
     try {
         const { userId } = req.auth();
-        const messages = (await Message.find({to_user_id: userId}).populate('from_user_id to_user_id')).sort({ createdAt: -1 });
-
+        const messages = await Message.find({
+        $or: [
+            { from_user_id: userId },
+            { to_user_id: userId }
+        ]
+        })
+        .populate("from_user_id to_user_id")
+        .sort({ createdAt: -1 });
         return res.json({ success: true, messages})
     } catch (error) {
         console.log(error);

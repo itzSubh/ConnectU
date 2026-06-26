@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, useLocation } from "react-router-dom"
 
 import Login from "./pages/Login"
 import Messages from "./pages/Messages"
@@ -10,27 +10,59 @@ import CreatePost from "./pages/CreatePost"
 import Feed from "./pages/Feed"
 import Layout from "./pages/Layout"
 import { useAuth, useUser } from "@clerk/react"
-import {Toaster} from 'react-hot-toast'
-import { useEffect } from "react"
+import toast, {Toaster} from 'react-hot-toast'
+import { useEffect, useRef } from "react"
 import { useDispatch } from 'react-redux'
 import { fetchUser } from "./app/userSlice"
+import { fetchConnections } from "./app/connectionsSlice"
+import { addMessages } from "./app/messagesSlice"
+import Notification from "./components/Notification"
 function App() {
 
   const {user} = useUser();
   const { getToken } = useAuth()
-
+  const { pathname } = useLocation()
   const dispatch = useDispatch()
+  const pathnameRef = useRef(pathname)
 
   useEffect(() => {
     const fetchData = async() => {
       if(user){
         const token = await getToken()
+        console.log("Token:", token);
         dispatch(fetchUser(token))
+        dispatch(fetchConnections(token))
       }
     }
     fetchData()
     
   },[user, getToken, dispatch])
+
+  useEffect(() => {
+    pathnameRef.current = pathname
+  }, [pathname])
+
+  useEffect(() => {
+    if(user){
+      const eventSource = new EventSource(import.meta.env.VITE_BASEURL + '/api/messages/' + user.id);
+      eventSource.onmessage = (event) => {
+        const message = JSON.parse(event.data)
+
+        if(pathnameRef.current === ('/messages/' + message.from_user_id._id)){
+          dispatch(addMessages(message))
+        }else{
+          toast.custom((t) => (
+            <Notification t={t} message={message}  />
+          ), {position:'bottom-right'})
+        }
+      }
+      return ()=> {
+        eventSource.close()
+      }
+    }
+  },[user, dispatch])
+
+
   return (
     
     <>
