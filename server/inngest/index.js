@@ -4,6 +4,7 @@ import Connection from "../models/connection.model.js";
 import sendEmail from "../config/nodeMailer.js";
 import Story from "../models/story.model.js";
 import Message from "../models/message.models.js";
+import Post from "../models/post.model.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "connectu" });
@@ -76,10 +77,32 @@ const syncUserDeletion = inngest.createFunction(
   async ({ event }) => {
     const { id } = event.data;
 
-    // Delete the user
+    // Delete user
     await User.findByIdAndDelete(id);
 
-    // Remove this user from every user's arrays
+    // Delete all posts created by the user
+    await Post.deleteMany({ user: id });
+
+    // Delete all stories created by the user
+    await Story.deleteMany({ user: id });
+
+    // Delete all messages sent or received by the user
+    await Message.deleteMany({
+      $or: [
+        { from_user_id: id },
+        { to_user_id: id },
+      ],
+    });
+
+    // Delete all connection request documents
+    await Connection.deleteMany({
+      $or: [
+        { from_user_id: id },
+        { to_user_id: id },
+      ],
+    });
+
+    // Remove deleted user from every other user's arrays
     await User.updateMany(
       {},
       {
@@ -91,15 +114,10 @@ const syncUserDeletion = inngest.createFunction(
       }
     );
 
-    // Delete connection documents
-    await Connection.deleteMany({
-      $or: [
-        { from_user_id: id },
-        { to_user_id: id },
-      ],
-    });
-
-    return { success: true };
+    return {
+      success: true,
+      message: "User and related data deleted successfully",
+    };
   }
 );
 

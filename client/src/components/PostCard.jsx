@@ -8,7 +8,14 @@ import { useAuth } from '@clerk/react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
 const PostCard = ({post}) => {
-    const postWithHashtags = post.content?.replace(/(#\w+)/g,'<span class= "text-indigo-600">$1</span>')
+    if (!post.user) {
+        return null;
+    }
+
+    const postWithHashtags = post.content?.replace(
+        /(#\w+)/g,
+        '<span class="text-indigo-600">$1</span>'
+    );
 
     const [likes, setLikes] = useState(post.likes_count);
     const currentUser = useSelector(state => state.user.value);
