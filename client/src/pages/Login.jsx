@@ -27,19 +27,21 @@ const Login = () => {
     <div className='flex min-h-screen flex-col md:flex-row bg-linear-to-r from-[#dfe2fe] via-[#b1cbfa] to-[#8e98f5]'>
     {/* Left side: Branding */}
     <div className='flex-1 flex flex-col items-start justify-between p-6 md:mt-10'>
-        <img src={assets.logo} alt='logo' className='h-12 object-contain' />
+          <h1 className='font-semibold flex cursor-pointer text-blue-800 text-3xl justify-center items-center '>Kaminey.in</h1>       
         <div>
             <div className='flex items-center gap-3 mb-4 max-md:mt-10'>
-                <img src={assets.group_users} alt="" />
+                {/* <img src={assets.group_users} alt="" /> */}
                 <div>
                     <div className='flex'>
                         {Array(5).fill(0).map((_,i)=> (<Star key={i} className='size-4 md:size-4.5 text-transparent fill-amber-500' />))}
                     </div>
-                    <p>Used by 12k+ users</p>
+                    <p>Used by 0+ users</p>
                 </div>
             </div>
-            <h1 className='text-3xl md:text-6xl md:pb-2 font-bold bg-linear-to-r from-indigo-950 to-indigo-800 bg-clip-text text-transparent'>More than just friends truly connect</h1>
-            <p className='text-xl md:text-3xl text-indigo-900 max-w-72 md:max-w-md'>Connect with Global Community on ConnectU</p>
+            <h1 className='text-3xl md:text-4xl md:pb-2 font-bold bg-linear-to-r from-indigo-950 to-indigo-800 bg-clip-text text-transparent'> <span className='text-red-600'>Uparwala:</span> Bolo vats kya chahiye?</h1>
+            <h1 className='text-3xl md:text-4xl md:pb-2 font-bold bg-linear-to-r from-indigo-950 to-indigo-800 bg-clip-text text-transparent'><span className='text-orange-400'>Vats:</span> Bss ek baar meri baat kaminey se karwa do, plzzz <span className='text-yellow-50'>🙏</span></h1>
+            <h1 className='text-3xl md:text-4xl md:pb-2 font-bold bg-linear-to-r from-indigo-950 to-indigo-800 bg-clip-text text-transparent'><span className='text-red-600'>Uparwala:</span> Jao vats login karoooo</h1>
+            <p className='text-xl md:text-3xl text-indigo-900 max-w-72 md:max-w-md'>Connect with Kaminey on Kaminey.in</p>
         </div>
         <span className='md:h-10'></span>
     </div>

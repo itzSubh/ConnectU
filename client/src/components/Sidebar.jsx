@@ -15,7 +15,7 @@ const Sidebar = ({sidebarOpen, setSidebarOpen}) => {
     <div className={`w-60 xl:w-72 bg-white border-r border-gray-200 flex flex-col justify-between items-center max-sm:absolute top-0 bottom-0 z-20 ${sidebarOpen ? 'translate-x-0' : 'max-sm:-translate-x-full'} transition-all duration-300 ease-in-out`}>
        <div className='w-full'>
           {/* <img onClick={() => navigate('/')} src={assets.logo} className='w-26 ml-7 my-2 cursor-pointer' /> */}
-          <h1 className=' flex cursor-pointer text-blue-800 text-3xl justify-center items-center '>Family.in</h1>
+          <h1 className='font-semibold flex cursor-pointer text-blue-800 text-3xl justify-center items-center p-2 ' onClick={() => navigate('/')}>Kaminey.in</h1>
           <hr className='border-gray-300 mb-8' />
           <MenuItems setSidebarOpen={setSidebarOpen} />
 
