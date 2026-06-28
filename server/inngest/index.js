@@ -67,17 +67,41 @@ const syncUserUpdation = inngest.createFunction(
 const syncUserDeletion = inngest.createFunction(
   {
     id: "delete-user-from-clerk",
-    triggers:[
-        {
+    triggers: [
+      {
         event: "clerk/user.deleted",
-        },
+      },
     ],
   },
-    async ({event}) => {
-        const {id } = event.data
-        await User.findByIdAndDelete(id)
-    }
-)
+  async ({ event }) => {
+    const { id } = event.data;
+
+    // Delete the user
+    await User.findByIdAndDelete(id);
+
+    // Remove this user from every user's arrays
+    await User.updateMany(
+      {},
+      {
+        $pull: {
+          followers: id,
+          following: id,
+          connections: id,
+        },
+      }
+    );
+
+    // Delete connection documents
+    await Connection.deleteMany({
+      $or: [
+        { from_user_id: id },
+        { to_user_id: id },
+      ],
+    });
+
+    return { success: true };
+  }
+);
 
 // Inngest function to send reminder when a new connection request is added
 
