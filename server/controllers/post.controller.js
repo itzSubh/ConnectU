@@ -2,6 +2,7 @@ import fs from 'fs'
 import imagekit from "../config/imagekit.js";
 import Post from '../models/post.model.js';
 import User from '../models/user.model.js';
+import Like from '../models/like.model.js';
 
 // Add Posts
 export const addPost = async (req, res) => {
@@ -47,52 +48,130 @@ export const addPost = async (req, res) => {
     }
     
 }
-
-// Get Posts
+// Get posts
 export const getFeedPosts = async (req, res) => {
     try {
-        const { userId } = req.auth()
-        const user = await User.findById(userId)
+        const { userId } = req.auth();
 
-        // user connections and following
-        const userIds = [userId, ...user.connections, ...user.following]
-const posts = await Post.find({ user: { $in: userIds } })
-    .populate("user")
-    .sort({ createdAt: -1 });
+        const user = await User.findById(userId);
 
-// Remove posts whose owner no longer exists
-const validPosts = posts.filter(post => post.user !== null);
+        if (!user) {
+            return res.json({
+                success: false,
+                message: "User not found",
+            });
+        }
 
-return res.json({
-    success: true,
-    posts: validPosts
-});
+        // User's own posts + connections + following
+        const userIds = [
+            userId,
+            ...user.connections,
+            ...user.following,
+        ];
+
+        const posts = await Post.find({
+            user: { $in: userIds },
+        })
+            .populate("user")
+            .sort({ createdAt: -1 });
+
+        // Remove posts whose owner no longer exists
+        const validPosts = posts.filter(post => post.user);
+
+        // Add like information to every post
+        const postsWithLikes = await Promise.all(
+            validPosts.map(async (post) => {
+
+                const likesCount = await Like.countDocuments({
+                    post: post._id,
+                });
+
+                const liked = await Like.exists({
+                    post: post._id,
+                    user: userId,
+                });
+
+                return {
+                    ...post.toObject(),
+                    likesCount,
+                    liked: !!liked,
+                };
+            })
+        );
+
+        return res.json({
+            success: true,
+            posts: postsWithLikes,
+        });
+
     } catch (error) {
         console.log(error);
-        return res.json({success: false, message: error.message})
+
+        return res.json({
+            success: false,
+            message: error.message,
+        });
     }
-}
+};
 
 // Like Post
 
 export const likePost = async (req, res) => {
     try {
+        console.log("LIKE CONTROLLER RUNNING");
         const { userId }= req.auth();
         const { postId }= req.body;
 
         const post = await Post.findById(postId)
-
-        if(post.likes_count.includes(userId)){
-            post.likes_count = post.likes_count.filter(user => user !== userId)
-            await post.save()
-            return res.json({success: true, message: 'Post Unliked'})
-        }else{
-            post.likes_count.push(userId)
-            await post.save()
-            return res.json({success: true, message: 'Post Liked'})
+        const existingLike = await Like.findOne({
+            post: postId,
+            user: userId
+        })
+        if(existingLike){
+            await Like.findByIdAndDelete(existingLike._id)
+            const likesCount = await Like.countDocuments({post: postId})
+            return res.json({success: true, liked: false, likesCount, message:'Post Unliked'})
         }
+
+        await Like.create({
+            post: postId,
+            user: userId
+        })
+        const likesCount = await Like.countDocuments({post: postId})
+        console.log({
+    success: true,
+    liked: true,
+    likesCount,
+    message: "Post Liked",
+});
+        return res.json({success: true, liked: true, likesCount, message: "Post Liked",});                                                                                                                                                                                                                                                                                                                                                                                              
+
     } catch (error) {
         console.log(error);
         return res.json({success: false, message: error.message})
     }
 }
+
+export const getPostLikes = async (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        const likes = await Like.find({
+            post: postId,
+        }).populate(
+            "user",
+            "username full_name profile_picture"
+        );
+
+        return res.json({
+            success: true,
+            users: likes.map(like => like.user),
+        });
+
+    } catch (error) {
+        return res.json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
